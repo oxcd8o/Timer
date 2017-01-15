@@ -16,12 +16,17 @@ class Timer
         Clock::time_point::duration raw() const { return Clock::now() - start_; }
         const Clock::time_point& start() const { return start_; }
 
-        template<class ReprT>
-        ReprT as() const
+        template<
+            class ReprT,
+            class PrecisionT = typename std::conditional<std::is_integral<ReprT>::value, std::chrono::microseconds, std::chrono::seconds>::type
+        > ReprT as() const
         {
-            using PrecisionT = typename std::conditional<std::is_integral<ReprT>::value, std::chrono::microseconds, std::chrono::seconds>::type;
-            using DiffT = std::chrono::duration<ReprT, typename PrecisionT::period>;
+            static_assert(std::is_arithmetic<ReprT>() || std::is_same<ReprT, std::string>(),
+                          "Timer: Only arithmetic types or std::string should be used as ReprT");
+            static_assert(!std::is_same<ReprT, std::string>() || std::is_same<PrecisionT, std::chrono::seconds>(),
+                          "Timer: Only std::chrono::seconds could be used as PrecisionT for when ReprT is std::string");
 
+            using DiffT = std::chrono::duration<ReprT, typename PrecisionT::period>;
             return std::chrono::duration_cast<DiffT>(raw()).count();
         }
 
@@ -30,7 +35,7 @@ class Timer
 };
 
 template<>
-std::string Timer::as<std::string>() const
+std::string Timer::as<std::string, std::chrono::seconds>() const
 {
     std::stringstream ss;
     ss << std::setprecision(6) << std::fixed << as<double>() << "s";

@@ -31,6 +31,13 @@ Or even string representation in predefined format (used in `operator<<`):
 auto seconds_string = timer.as<std::string>();
 ```
 
+## Pro usage
+If you want the timer to show elapsed time with specific precision, then you may specify it explicitly:
+```c++
+auto nanoseconds = timer.as<int, std::chrono::nanoseconds>();
+```
+Note, that attempt to specify precision with std::string as representation type will lead to compilation error. If you want some arbitrary stringification, you must write it yourself.
+
 ## Raw data
 If methods above are too inflexible for you, you may get raw `std::chrono::duration` and use is as you wish:
 ```c++
