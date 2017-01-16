@@ -8,6 +8,8 @@ class Timer
 {
     public:
         using Clock = std::chrono::steady_clock;
+        template<class ReprT>
+            using DefaultPrecision = typename std::conditional<std::is_integral<ReprT>::value, std::chrono::microseconds, std::chrono::seconds>::type;
 
         Timer():
             start_(Clock::now())
@@ -16,10 +18,8 @@ class Timer
         Clock::time_point::duration raw() const { return Clock::now() - start_; }
         const Clock::time_point& start() const { return start_; }
 
-        template<
-            class ReprT,
-            class PrecisionT = typename std::conditional<std::is_integral<ReprT>::value, std::chrono::microseconds, std::chrono::seconds>::type
-        > ReprT as() const
+        template<class ReprT, class PrecisionT = DefaultPrecision<ReprT>>
+        ReprT as() const
         {
             static_assert(std::is_arithmetic<ReprT>() || std::is_same<ReprT, std::string>(),
                           "Timer: Only arithmetic types or std::string should be used as ReprT");
