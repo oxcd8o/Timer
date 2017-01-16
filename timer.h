@@ -24,7 +24,7 @@ class Timer
             static_assert(std::is_arithmetic<ReprT>() || std::is_same<ReprT, std::string>(),
                           "Timer: Only arithmetic types or std::string should be used as ReprT");
             static_assert(!std::is_same<ReprT, std::string>() || std::is_same<PrecisionT, std::chrono::seconds>(),
-                          "Timer: Only std::chrono::seconds could be used as PrecisionT for when ReprT is std::string");
+                          "Timer: Only std::chrono::seconds could be used as PrecisionT when ReprT is std::string");
 
             using DiffT = std::chrono::duration<ReprT, typename PrecisionT::period>;
             return std::chrono::duration_cast<DiffT>(raw()).count();
